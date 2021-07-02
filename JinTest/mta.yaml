@@ -1,0 +1,38 @@
+ID: zsample_template
+_schema-version: "2.1"
+version: 0.0.1
+modules:
+  - name: zsample_template-db
+    type: hdb
+    path: db
+    parameters:
+      memory: 256M
+      disk-quota: 512M
+    requires:
+      - name: zsample_template-db-hdi-container
+  - name: zsample_template-srv
+    type: nodejs
+    path: srv
+    parameters:
+      memory: 512M
+      disk-quota: 512M
+    provides:
+      - name: srv_api
+        properties:
+          url: ${default-url}
+    requires:
+      - name: zsample_template-db-hdi-container
+      - name: zsample_template-uaa
+resources:
+  - name: zsample_template-db-hdi-container
+    type: com.sap.xs.hdi-container
+    properties:
+      hdi-container-name: ${service-name}
+  - name: zsample_template-uaa
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service-plan: default
+      service: xsuaa
+      config:
+        xsappname: zsample_template
+        tenant-mode: dedicated
